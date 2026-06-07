@@ -1,19 +1,12 @@
 # AI Development Team Playbook
 
-개발 요청을 실제 회사의 팀 운영 방식처럼 분류하고, 필요한 AI 역할만 선발해 구현과 검증까지 연결하는 멀티 에이전트 운영 포트폴리오입니다.
+개발 요청을 분류하고 필요한 AI 역할만 선발해 기획, 구현, 보안 검토, 테스트, 최종 보고까지 연결하는 개발팀 운영 플레이북입니다.
 
-This repository demonstrates a practical operating model for an AI-assisted software team. It focuses on role selection, scoped delegation, parallel execution, security gates, QA, and evidence-based delivery.
+## What I Built / 만든 것
 
-## Portfolio Highlights / 포트폴리오 핵심
+AI 에이전트를 역할 이름만 붙여 호출하는 방식이 아니라, 실제 개발 작업에서 책임과 인수인계 기준을 적용할 수 있도록 PM 중심 운영 구조를 만들었습니다. 공통 규칙은 `AGENTS.md`, 역할별 실행 기준은 `agents/`, 적용 예시와 위임 형식은 `docs/`와 `examples/`에 분리했습니다.
 
-- 요청을 `Feature`, `Bugfix`, `UI`, `API`, `Data`, `AI`, `Infra`, `Security` 등으로 분류
-- 작업 규모와 위험도에 따라 필요한 역할만 자동 선발
-- 동일 파일 충돌을 방지하는 병렬 작업 규칙
-- 보안, 데이터 변경, AI 기능에 대한 전문 품질 게이트
-- Acceptance Criteria와 검증 결과를 연결하는 완료 보고
-- 프로젝트별 `AGENTS.md` 오버라이드 지원
-
-## Team Structure / 팀 구성
+## Team Model / 팀 구성
 
 ```text
 PM / Team Lead
@@ -29,66 +22,73 @@ PM / Team Lead
 └── QA Engineer
 ```
 
-각 역할은 [`agents/`](agents/)에 Mission, Start Checklist, Operating Rules, Done Checklist, Handoff Format으로 정의되어 있습니다.
-
-## How It Works / 운영 방식
+## Workflow / 작업 흐름
 
 ```mermaid
 flowchart LR
-    A[User Request] --> B[PM Classification]
+    A[User Request] --> B[Classification]
     B --> C[Risk and Scope]
     C --> D[Role Selection]
     D --> E[Discovery and Plan]
     E --> F[Scoped Implementation]
     F --> G[Security and QA Gates]
-    G --> H[Integrated Delivery Report]
+    G --> H[Evidence-based Delivery]
 ```
 
-1. PM이 목표, 범위, 성공 조건을 정리합니다.
-2. 변경 신호에 따라 필요한 역할만 선택합니다.
-3. 코드베이스 구조와 검증 명령을 먼저 확인합니다.
-4. 독립 작업만 병렬로 위임하고 파일 소유권을 분리합니다.
-5. PM이 결과를 통합 검토하고 품질 게이트를 실행합니다.
-6. 변경, 검증, 미검증 영역, 남은 위험을 보고합니다.
+1. 요청을 `Bugfix`, `Feature`, `UI`, `API`, `Data`, `AI`, `Infra`, `Security` 등으로 분류합니다.
+2. 변경 범위와 위험도를 `Tiny`부터 `Incident`까지 판단합니다.
+3. 변경 신호에 맞는 역할만 선택합니다.
+4. 기존 코드 구조와 실행·검증 명령을 먼저 확인합니다.
+5. 독립 작업만 위임하고 수정 파일의 소유권을 분리합니다.
+6. PM이 결과를 통합한 뒤 보안·데이터·AI·QA 게이트를 적용합니다.
+7. 변경 내용, 실행한 검증, 미검증 영역, 남은 위험을 보고합니다.
 
-## Automatic Role Selection / 자동 역할 선발
+## Role Selection / 역할 선발
 
-| Change signal | Roles |
-|---|---|
-| UI, component, CSS, accessibility | Frontend, QA |
+| 변경 신호 | 적용 역할 |
+| --- | --- |
+| 화면, 컴포넌트, CSS, 접근성 | Frontend, QA |
 | API, route, validation | Backend, QA |
-| Schema, migration, query | Database, Backend, QA |
-| Auth, permission, token, secret | Security, relevant developer, QA |
+| schema, migration, query | Database, Backend, QA |
+| 인증, 권한, token, secret | Security, 관련 개발자, QA |
 | LLM, prompt, RAG, embedding | AI, Backend, Security, QA |
 | Docker, CI/CD, deployment | DevOps, Security, QA |
-| Large feature | Planner, Architect, relevant developers, Security, QA |
+| 큰 신규 기능 | Planner, Architect, 관련 개발자, Security, QA |
 
-자세한 흐름은 [`docs/operating-model.md`](docs/operating-model.md), 실제 적용 예시는 [`docs/case-study.md`](docs/case-study.md)를 참고합니다.
+## Development Rules / 운영 규칙
 
-## Parallel Work Rules / 병렬 작업 규칙
-
-- PM의 즉시 다음 결정을 막는 핵심 작업은 직접 처리합니다.
-- 서로 독립적인 조사, 구현, 리뷰만 병렬화합니다.
-- 같은 파일을 여러 역할이 동시에 수정하지 않습니다.
-- 구현 담당자에게 허용 파일과 금지 파일을 명시합니다.
-- Security와 QA 결과는 PM이 최종 구현과 대조합니다.
-
-위임 템플릿은 [`examples/delegation-brief.md`](examples/delegation-brief.md)에 있습니다.
+- 모든 역할을 항상 투입하지 않고 범위와 위험도에 맞춰 선택합니다.
+- 같은 파일을 여러 작업자가 동시에 수정하지 않도록 책임 범위를 지정합니다.
+- 기존 코드베이스의 구조와 패턴을 역할별 일반 지침보다 우선합니다.
+- destructive migration, 대량 데이터 변경, secret 변경은 별도 승인 대상으로 다룹니다.
+- AI 출력은 구조화, 파싱 실패, 개인정보, prompt injection, human approval 관점에서 검토합니다.
+- Acceptance Criteria와 실제 테스트 명령을 연결해 완료 근거를 남깁니다.
 
 ## Repository Structure / 저장소 구조
 
 ```text
 .
-├── AGENTS.md                 # reusable team operating rules
-├── agents/                   # role-specific playbooks
+├── AGENTS.md
+├── agents/
+│   ├── pm.md
+│   ├── planner.md
+│   ├── architect.md
+│   ├── frontend.md
+│   ├── backend.md
+│   ├── database.md
+│   ├── ai.md
+│   ├── server.md
+│   ├── devops.md
+│   ├── security.md
+│   └── qa.md
 ├── docs/
-│   ├── operating-model.md    # lifecycle and quality gates
-│   └── case-study.md         # applied project example
-├── examples/
-│   └── delegation-brief.md   # scoped agent handoff examples
-└── scripts/
-    └── validate.sh           # repository structure checks
+│   ├── operating-model.md
+│   └── case-study.md
+├── examples/delegation-brief.md
+└── scripts/validate.sh
 ```
+
+각 역할 문서는 `Mission`, `Start Checklist`, `Operating Rules`, `Done Checklist`, `Handoff Format`을 공통 구조로 사용합니다.
 
 ## Validation / 검증
 
@@ -96,16 +96,8 @@ flowchart LR
 bash scripts/validate.sh
 ```
 
-GitHub Actions에서도 같은 검증을 실행합니다.
+검증 스크립트는 필수 파일, 역할 문서 구조, 링크 대상, 운영 문서 구성을 확인하며 GitHub Actions에서도 실행됩니다.
 
-## Design Principles / 설계 원칙
-
-- 필요한 역할만 투입합니다.
-- 기존 코드베이스의 패턴을 우선합니다.
-- 큰 변경을 작고 검증 가능한 단위로 나눕니다.
-- 보안, 데이터 손실, 운영 위험을 숨기지 않습니다.
-- AI의 결과를 그대로 신뢰하지 않고 테스트와 통합 리뷰로 확인합니다.
-
-## License / 라이선스
+## License
 
 MIT License
